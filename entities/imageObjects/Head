@@ -1,0 +1,55 @@
+class Head{
+    constructor(target, images){
+        this.target = target;
+        this.timeToSwitch = 0.5;
+
+        this.startTime = time.runTime;
+
+        this.images = images;
+
+        this.offset = new Vector(0, 0);
+
+        this.timeAlive = 0;
+        this.idleMultiplier = 0.5;
+
+        if(this.target.hasNotMoved) this.canStartMoving = true;
+    }
+
+    get isDown(){
+        return this.timeAlive % this.timeToSwitch < this.timeToSwitch/2;
+    }
+
+    get position(){
+        let position = this.target.position.add(this.offset);
+
+        if(this.target.hasNotMoved) position.y -= 5;
+        else if (this.timeAlive < this.timeToSwitch*4 && this.canStartMoving) position.y -= 4 - Math.floor(this.timeAlive / this.timeToSwitch);
+        else if(this.isDown)      position.y -= 1;
+        
+        return position;
+    }
+
+    update(){
+        if(!this.target.hasNotMoved) {
+            if(this.image == playerHeads.normal && this.timeAlive >= this.timeToSwitch*4) 
+                this.timeAlive += time.deltaTime*this.idleMultiplier;
+            else{ this.timeAlive += time.deltaTime; }
+        }
+    }
+
+    get image(){
+        if(this.target.animationName == 'left')         return this.images.left;
+        if(this.target.animationName == 'right')        return this.images.right;
+        if(this.target.animationName == 'up')           return this.images.up;
+        if(this.target.animationName == 'down')         return this.images.down;
+        if(this.target.animationName == 'upLeft')       return this.images.upLeft;
+        if(this.target.animationName == 'upRight')      return this.images.upRight;
+        if(this.target.animationName == 'downLeft')     return this.images.downLeft;
+        if(this.target.animationName == 'downRight')    return this.images.downRight;
+        return this.images.normal;
+    }
+
+    updateImage(transparency){
+        this.image.draw(this.position.x, this.position.y, 'right', transparency);
+    }
+}

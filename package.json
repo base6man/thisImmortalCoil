@@ -1,0 +1,44 @@
+{
+  "name": "namegoeshere",
+  "version": "1.0.0",
+  "description": "A quick start for building P5 sketches in Electron.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "test": "mocha ./js/**/*.test.js",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . This Immortal Coil --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"This Immortal Coil\"",
+    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
+    "package": "electron-forge package",
+    "publish": "electron-forge publish",
+    "make": "electron-builder -w"
+  },
+  "repository": "https://github.com/camerenisonfire/p5-electron-quick-start",
+  "keywords": [
+    "P5",
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "Cameren Dolecheck",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "electron-reload": "^1.5.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "mocha": "^10.1.0",
+    "p5": "^0.9.0",
+    "sound-play": "^1.1.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^23.6.0",
+    "@electron-forge/cli": "^6.0.5",
+    "@electron-forge/maker-deb": "^6.0.5",
+    "@electron-forge/maker-rpm": "^6.0.5",
+    "@electron-forge/maker-squirrel": "^6.0.5",
+    "@electron-forge/maker-zip": "^6.0.5",
+    "@electron-forge/publisher-github": "^6.0.5",
+    "electron": "^23.1.3"
+  }
+}

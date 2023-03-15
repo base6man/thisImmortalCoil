@@ -1,0 +1,5 @@
+node_modules
+dist
+myApplicationBuiltwin32x64
+installers
+out/
