@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -26,5 +26,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: sudo dpkg --add-architecture i386
+    - run: wget -qO - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+    - run: sudo add-apt-repository ppa:cybermax-dexter/sdl2-backport
+    - run: sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu $(lsb_release -cs) main"
+    - run: sudo apt install --install-recommends winehq-stable
     - run: npm ci
     - run: npm run make --if-present
