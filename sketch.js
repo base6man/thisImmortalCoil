@@ -76,7 +76,7 @@ let songSwitchTime;
 
 let difficulty = 1;
 let runNumber = 0;
-let deathDifficulties = [1, 2, 3]
+let deathDifficulties = []
 
 function getDeathCount(){ 
   return deathDifficulties.length; 
