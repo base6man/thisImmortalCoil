@@ -33,6 +33,7 @@ jobs:
     - run: sudo apt install winehq-stable
     - run: npm ci
     - run: npm run make --if-present
+    - run: rm -r dist/win-unpacked
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
       with:
