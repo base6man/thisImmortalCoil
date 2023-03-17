@@ -3,6 +3,8 @@ const { app, BrowserWindow } = require('electron')
 const url = require('url')
 const path = require('path')
 const {ipcMain} = require('electron')
+const fs = require('fs')
+//require('@electron/remote/main').initialize()
 
 if (handleSquirrelEvent(app)) {
   // squirrel event handled and app will exit in 1000ms, so don't do anything else
@@ -43,6 +45,18 @@ function createWindow() {
     hiddenWindow = null
     if (process.platform !== 'darwin') app.quit()
     
+    //let deathDifficulties = remote.getGlobal('deathDifficulties');
+    //let deathBosses = remote.getGlobal('deathBosses');
+    //let hardMode = remote.getGlobal('hardMode');
+
+    fs.truncate('lib/saveData.txt', 0, function(){console.log('done')})
+            
+    fs.appendFile("lib/saveData.txt", global.myGlobalVariable, function (err) {
+        if (err) return console.error(err);
+        else{
+           console.log("The file is updated with the given data")
+        }
+    });
   })
 }
 
@@ -67,6 +81,11 @@ ipcMain.on('synchronous-message', (event, arg) => {
   // Event emitter for sending asynchronous messages
   if(arg.slice(-4) == '.wav') event.returnValue = arg
 })
+
+
+ipcMain.on( "setMyGlobalVariable", ( event, myGlobalVariableValue ) => {
+  global.myGlobalVariable = myGlobalVariableValue;
+} );
 
 /*
 // Event handler for synchronous incoming messages

@@ -395,6 +395,21 @@ class Boss extends PhysicsObject{
         this.counterAttack = false;
     }
 
+    getKnockedBack(){
+
+        this.finishAttack();
+        this.attackManager.waitForSeconds(1/this.agressiveness);
+
+        let knockbackVector = this.vectorToPlayer;
+        knockbackVector.angle += Math.PI;
+        knockbackVector.magnitude = this.knockbackSpeed * this.speedMult;
+
+        this.velocity = knockbackVector;
+        
+        this.knockedBack = true;
+        time.delayedFunction(this, 'endKnockback', this.knockbackTime);
+    }
+
     endKnockback(){
         this.knockedBack = false;
         this.velocity.magnitude = this.speed;
@@ -409,7 +424,7 @@ class Boss extends PhysicsObject{
                 newVector.angle = this.angleToPlayer;
                 let newBullet = new Bullet(9, this.position, new Vector(0, 0));
                 newBullet.timeAlive = 0.1;
-                newBullet.hitInvinciblePlayer = true;
+                newBullet.hitInvinciblePlayer = false;
             }
             else if(!this.invincible){
 
@@ -433,20 +448,10 @@ class Boss extends PhysicsObject{
                         scene.mainCamera.createShake();
                     }
 
-                    this.finishAttack();
-                    this.attackManager.waitForSeconds(1/this.agressiveness);
-
                     this.invincible = true;
                     time.delayedFunction(this, 'endInvincibility', this.healthBar.switchTime);
 
-                    let knockbackVector = this.vectorToPlayer;
-                    knockbackVector.angle += Math.PI;
-                    knockbackVector.magnitude = this.knockbackSpeed * this.speedMult;
-    
-                    this.velocity = knockbackVector;
-                    
-                    this.knockedBack = true;
-                    time.delayedFunction(this, 'endKnockback', this.knockbackTime);
+                    this.getKnockedBack();
 
                     this.displayHealth();
 

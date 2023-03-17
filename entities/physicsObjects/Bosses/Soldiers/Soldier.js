@@ -27,7 +27,7 @@ class Soldier extends Boss{
         this.health = 3;
         
         this.knockbackSpeed = 40;
-        this.knockbackTime = 0.15;
+        this.knockbackTime = 0.2;
         
         this.normalLookAheadTime = 0.4;
         this.lookAheadTime = this.normalLookAheadTime;

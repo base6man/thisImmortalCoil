@@ -10,11 +10,12 @@
 
 //Imports P5. Instantiates the sketch at the bottom of this file.
 const p5 = require('p5');
+const fs = require('fs')
 const {ipcRenderer} = require('electron')
 
 let scene, transition, functionObject;
 
-let skipIntro = true, introSpeed = 1, canPlayIntro = true;
+let skipIntro = true, introSpeed = 1, canPlayIntro = false;
 let transitionFont, textboxFont;
 
 let attackImage, diagonalAttackImage, stillAttackImage;
@@ -68,17 +69,32 @@ let cutsceneMult = 1.25;
 let songs, creditsSong;
 let currentSong, currentSongName, previousSong;
 let songVolume = 0.5; // 0.5
+let currentSongVolume;
 
 let voiceEffects;
-let whoosh;
+let whoosh, hit;
 let whooshVolume = 0.6;
 
 let staticVolume = 0.0;
-let songSwitchTimeTotal = 1.0;
+let songSwitchTimeTotal;
 let songSwitchTime;
 
 let difficulty = 1;
 let runNumber = 0;
+
+let saveFileContents;
+fs.readFile("lib/saveData.txt", function(err, data) {
+    if(err) return console.error(err);
+    saveFileContents = data.toString();
+
+    let fileArray = saveFileContents.split(/\r?\n/);
+
+    if(fileArray[0]) deathDifficulties = fileArray[0].split(",");
+    if(fileArray[1]) deathBosses = fileArray[1].split(",");
+    if(fileArray[2]) hardMode = fileArray[2];
+    console.log(deathDifficulties, deathBosses, hardMode)
+});
+
 let deathDifficulties = []
 let hardMode = false;
 let deathBosses = []
@@ -209,7 +225,8 @@ let layerMap = [
   {a: 'shieldGhost',b: 'enemyAttack'},
   {a: 'shieldGhost',b: 'blueBullet'},
   {a: 'npc',        b: 'playerAttack'},
-  {a: 'playerAttack', b: 'attackTrigger'}
+  {a: 'playerAttack', b: 'attackTrigger'},
+  {a: 'playerAttack', b: 'enemyAttack'}
 ]
 
 function isBetween(num, a, b) {
@@ -254,9 +271,13 @@ function killScene(newTransition = new Transition([], p), timeUntilNextScene){
   scene = null;
 
   time.delayedFunction(functionObject, 'createScene', timeUntilNextScene);
+  time.delayedFunction(functionObject, 'setupScene', timeUntilNextScene);
 }
 
-function playSong(song, oldSong, volume){
+function playSong(song, oldSong, volume, switchTime = 1){
+
+  songSwitchTimeTotal = switchTime; 
+  songSwitchTime = -0.5;
 
   if(song){
     if(currentSongName == song) return;
@@ -268,16 +289,14 @@ function playSong(song, oldSong, volume){
     //currentSong.play();
     currentSong.loop = true;
     
-    if(oldSong)
-      previousSong = oldSong;
+    //if(oldSong)
+    //  previousSong = oldSong;
     
-
-    songSwitchTime = -0.5;
   }
-  else if(oldSong){
+  if(oldSong){
     previousSong = oldSong;
-    oldSong.pause();
-    oldSong.currentTime = 0;
+    //oldSong.pause();
+    //oldSong.currentTime = 0;
   }
 
   //time.previousFrameSongRunTime = 0;
@@ -390,7 +409,8 @@ const sketch = (p) => {
       p.loadImage("images/floorImages/bigRedbutton.png"),
       p.loadImage("images/floorImages/bigRedbutton1.png"),
       p.loadImage("images/floorImages/bigRedbutton2.png"),
-      p.loadImage("images/floorImages/bigRedbutton1.png")
+      p.loadImage("images/floorImages/bigRedbutton1.png"),
+      p.loadImage("images/floorImages/bigRedbuttonPressed.png")
     ]
 
     attackImage = [
@@ -536,6 +556,7 @@ const sketch = (p) => {
     creditsSong = "sounds/mortimerKeep.wav";
     
     whoosh = "sounds/whoosh.wav";
+    hit = "sounds/hit.mp3";
     voiceEffects = {
       sam: "sounds/voiceSam.wav",
       dot: "sounds/voiceDot.wav",
@@ -656,27 +677,9 @@ const sketch = (p) => {
       switch: clocksmithSwitch,
       reverseSwitch: clocksmithReverseSwitch
     }
+
+    functionObject.createScene();
     
-    if(skipIntro){
-      functionObject.createScene();
-    }
-    else{
-      transition = new Transition([
-        new Quote('Welcome to Noxal Force!', 3.2, castleImages[0], new Vector(0, -1300), new Vector(0, 120)),
-        new Quote('This is a game about escaping a castle.', 3.2, castleImages[0], new Vector(0, -916), new Vector(0, 120)), 
-        new Quote('Once the thriving center of a great kingdom, \nMortimor Keep has fallen to ruin.', 6.4, castleImages[0], new Vector(0, -532), new Vector(0, 120)), 
-        new Quote('The Tower Gardens are long collapsed, \nnow crawling with spikeroot.', 6.4, castleImages[1], new Vector(0, 150), new Vector(0, -50)),
-        new Quote('Our once famous dining hall may still exist, \nbut nobody has seen it in years.', 6.4, castleImages[2], new Vector(100, 100), new Vector(-30, -30)),
-        new Quote('The secret vault still stands, \nbut its treasure is rumored to be gone.', 6.4, castleImages[3], new Vector(0, 50), new Vector(0, -15)),
-        new Quote('Indeed, the Seven Walls have nothing left to protect.', 6.4, castleImages[4]),
-        new Quote('So go.', 1.6),
-        new Quote('Go now.', 1.6),
-        new Quote('Escape.', 3.2),
-        new Quote('There is nothing for you here.', 3.2)
-      ], p);
-  
-      playSong(creditsSong);
-    }
     //getAudioContext().suspend();
   };
     
@@ -712,9 +715,14 @@ const sketch = (p) => {
       p.noStroke();
       p.textFont(transitionFont);
   
-      p.text('Press Any Key', p.width/2, p.height-100);
+      p.text('Press SPACE to begin', p.width/2, p.height-100);
   
       p.pop();
+
+      if(KeyReader.holdSpace) {
+        canPlayIntro = true;
+        functionObject.setupScene();
+      }
       return;
     }
   
@@ -749,16 +757,6 @@ const sketch = (p) => {
       if(endTime - startTime > 100) console.log(updateTime, imageTime);
     }
   };
-
-  function keyPressed(){
-    canPlayIntro = true;
-    if(time) time.startSongTime = time.runTime;
-  }
-
-  function mousePressed(){
-    canPlayIntro = true;
-    if(time) time.startSongTime = time.runTime;
-  }
 
   p.windowResized = () => {
     p.resizeCanvas(p.windowWidth, p.windowHeight);

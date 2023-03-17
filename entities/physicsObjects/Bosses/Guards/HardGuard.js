@@ -10,7 +10,7 @@ class HardGuard extends Guard{
 
         this.minimumDistanceToDodge = 40;
 
-        this.difficultyMultiplier = 0.8;
+        this.difficultyMultiplier = 0.7;
 
         
         if(this.globalDifficulty == 4.5) {
@@ -129,7 +129,6 @@ class HardGuard extends Guard{
             time.delayedFunction(scene, "blinkOutToNewScene", 0.2);
         }
         else{
-            scene.endSong();
             scene.displayFloor = true;
             scene.finalDotOutro(this.position);
         }

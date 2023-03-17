@@ -18,6 +18,7 @@ class Bullet extends PhysicsObject{
         this.melee = false;
         this.isShield = false;
         this.playerAttack = false;
+        this.tradeHits = false;
 
         this.collider = new CircleCollider(this, colliderRadius);
         this.collider.layer = 'enemyAttack';

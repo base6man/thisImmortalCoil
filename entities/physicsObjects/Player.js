@@ -496,7 +496,16 @@ class Player extends PhysicsObject{
 
     onTriggerCollision(other){
 
-        if(other.collider.layer == 'enemyAttack' && this.reflect){
+        if (other.collider.layer == 'enemyAttack' && other.tradeHits && this.attackObject && this.attackObject.isStillAlive){
+            this.attackObject.dissapate();
+            other.dissapate();
+
+            this.knockedBack = true;
+            time.delayedFunction(this, 'endKnockback', this.knockbackTime);
+            this.doKnockback(other.position);
+            scene.bossManager.bosses[0].getKnockedBack();
+        }
+        else if(other.collider.layer == 'enemyAttack' && this.reflect){
             let newVelocity = other.velocity.copy();
             newVelocity.angle += Math.PI;
             newVelocity.magnitude *= 1.5;
@@ -518,6 +527,8 @@ class Player extends PhysicsObject{
 
             if(!this.invincible){
                 
+                scene.timeSinceLastHit = 0;
+                playSound(hit);
                 this.health -= 1;
 
                 if(this.health <= 0){

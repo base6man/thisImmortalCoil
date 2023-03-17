@@ -1,3 +1,5 @@
+//const { ipcRenderer, remote } = require( "electron" );
+
 class Scene{
     constructor(p, startingPlayerPosition = new Vector(94, -347)){
         this.p = p;
@@ -26,6 +28,7 @@ class Scene{
         this.gameOver = false;
 
         this.uiElements = [];
+        this.timeSinceLastHit = 999;
 
         this.referenceBosses = [];
 
@@ -44,7 +47,9 @@ class Scene{
         this.coverScreenColor = this.p.color(0, 0, 0);
         this.displayFloor = true;
 
-        time.synchingWithSong = false;
+        this.buttonPressed = false;
+
+        time.stopSynch();
     }
 
     // Setup initializes variables that require operations
@@ -368,6 +373,8 @@ class Scene{
             '', 7.5,
             'delete', 9
         ]));
+
+        time.delayedFunction(this, 'endSong', 6.5, [3.5])
     }
 
     operatorIntro(){
@@ -625,6 +632,8 @@ class Scene{
         this.coverScreenColor = this.p.color(255, 255, 255);
         this.coverScreenChange = 0.9;
 
+        this.buttonPressed = true;
+
         time.delayedFunction(this, 'throwErrorUponSamsDeath', 1.2);
         time.delayedFunction(this, 'killSceneUponSamsComputerDeath', 12.82);
     }
@@ -735,9 +744,12 @@ class Scene{
             this.floor.updateImage();
         }
 
-        if(runNumber != 5){
+        if(!this.buttonPressed){
             let buttonIndex = Math.floor((6*time.runTime) % 4);
             bigRedButtonImage[buttonIndex].draw(25, 537.5);
+        }
+        else{
+            bigRedButtonImage[4].draw(25, 537.5)
         }
 
         for(let i in this.walls){ this.walls[i].updateImage(); }
@@ -795,11 +807,18 @@ class Scene{
         const s = songSwitchTime;
         const t = songSwitchTimeTotal;
 
+        let hitMultiplier = Math.min(this.timeSinceLastHit, 1);
+        this.timeSinceLastHit += time.deltaTime;
+
         if(previousSong) previousSong.volume = Math.max(Math.min((-s / t + 1) * songVolume, songVolume), 0);
 
         if((!previousSong || previousSong.volume < songVolume/4) && currentSong && currentSong.paused)  {
             currentSong.play();
-            currentSong.volume *= songVolume;
+            currentSongVolume = currentSong.volume * songVolume;
+        }
+
+        if(currentSong && !currentSong.paused){
+            currentSong.volume = currentSongVolume * hitMultiplier;
         }
 
         if(previousSong && previousSong.volume < 0 && !previousSong.paused) {
@@ -814,8 +833,8 @@ class Scene{
     updateSong(song, volume = 1.0, instant = false){
             
         let oldSong = currentSong;
-        if(oldSong == song && song) return;
-        if (oldSong == songs[runNumber]) return;
+        //if(oldSong == song && song) return;
+        //if (oldSong == songs[runNumber]) return;
 
         if(oldSong) console.log(oldSong);
 
@@ -825,8 +844,8 @@ class Scene{
         
     }
 
-    endSong(){
-        playSong(null, currentSong, 1.0);
+    endSong(timeToEnd){
+        playSong(null, currentSong, 1.0, timeToEnd);
     }
 
     killBulletsInRange(position, radius){
@@ -906,6 +925,7 @@ class Scene{
         time.stopFunctionsWithinScene();
         runNumber++
         functionObject.createScene(this.player.position);
+        functionObject.setupScene();
     }
 
     checkForGameOver(){
@@ -929,6 +949,7 @@ class Scene{
                 time.stopFunctionsWithinScene();
                 
                 functionObject.createScene();
+                functionObject.setupScene();
             }
             else{
                 if(this.runCredits){
@@ -940,12 +961,12 @@ class Scene{
 
                     let newTransition = new TypedTransition(
                     [
-                        new Quote('This Immortal Coil', 0, castleImages[0], new Vector(0, -1300), new Vector(0, 200)),
-                        new Quote('A game by Keaton Mitchell', 3.205, castleImages[0], new Vector(0, -659), new Vector(0, 200)), 
-                        new Quote('Thanks to all my playtesters,\nthe game is finally out.', 6.41, castleImages[1], new Vector(0, 150), new Vector(0, -50)),
+                        new Quote('This Immortal Coil', 0, castleImages[0], new Vector(0, -1300), new Vector(0, 130)),
+                        new Quote('A game by Keaton Mitchell', 3.205, castleImages[0], new Vector(0, -883), new Vector(0, 130)), 
+                        new Quote('Thanks to all my playtesters,\nthe game is finally out!', 6.41, castleImages[1], new Vector(0, 150), new Vector(0, -50)),
                         new Quote('Israel Sanchez, Harper Mitchell,\nKnox Crain, and many, many more.', 12.82, castleImages[2], new Vector(100, 100), new Vector(-30, -30)),
                         new Quote('Script written by Mitch Mitchell\nIdeas endured by Audrey Mitchell', 19.23, castleImages[3], new Vector(0, 50), new Vector(0, -15)),
-                        new Quote('Special Thanks to Deuce Broom for\n fixing a fatal error before release.', 25.64, castleImages[4]),
+                        new Quote('Special Thanks to Deuce Broom for\n fixing a fatal error before launch.', 25.64, castleImages[4]),
                         new Quote('Thanks for playing!', 32.05)
                     ], this.p);
                     newTransition.textSize = 50;
@@ -959,6 +980,8 @@ class Scene{
                     ], this.p), 1.5);
                 }
             }
+
+            ipcRenderer.send( "setMyGlobalVariable", deathDifficulties + "\n" + deathBosses + "\n" + hardMode);
         }
     }
 
