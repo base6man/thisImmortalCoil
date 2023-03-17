@@ -1,5 +1,5 @@
 class Scene{
-    constructor(p, startingPlayerPosition = new Vector(94, -360)){
+    constructor(p, startingPlayerPosition = new Vector(94, -347)){
         this.p = p;
         this.startingPlayerPosition = startingPlayerPosition;
 
@@ -21,9 +21,11 @@ class Scene{
         this.textBoxHeight = 20;
         this.quote = '';
 
+        this.sceneEndText = 'loading...'
+        this.runCredits;
         this.gameOver = false;
 
-        this.otherImages = [];
+        this.uiElements = [];
 
         this.referenceBosses = [];
 
@@ -37,17 +39,52 @@ class Scene{
         this.isInCutscene = false;
         this.fastForwarding = false;
 
-        this.screenIsBlack = false;
+        this.coverScreen = 0;
+        this.coverScreenChange = 0;
+        this.coverScreenColor = this.p.color(0, 0, 0);
         this.displayFloor = true;
+
+        time.synchingWithSong = false;
     }
 
     // Setup initializes variables that require operations
     setup() {
         let numSpecialTiles = 7;
-        let floorChaos = runNumber * 0.15 / numSpecialTiles;
+        let floorChaos = runNumber * 0.15 / numSpecialTiles; 
 
-        if(runNumber == 4) {
-            this.displayFloor = false;
+        this.player = new Player(this.startingPlayerPosition, this.p);
+        this.bossManager = new BossManager(this.p);
+
+        if(runNumber == 5) {
+            this.walls = []
+            
+            new Wall(-1000, 500, -50, 2000, this.p);
+            new Wall(50, 500, 1000, 2000, this.p);
+            new Wall(-1000, 580, 1000, 2000, this.p);
+
+            floorChaos = 0;
+            this.player.position = new Vector(-25, 550);
+
+            this.coverScreen = 1;
+            this.coverScreenChange = -1.2
+        }
+        else{
+            new Wall(-1000, -120,   -11.5, -300, this.p);
+            new Wall(1000, -120,    11.5, -300, this.p);
+    
+            new Wall(-1000, -300, -200, 500, this.p);
+            new Wall(200, -300,   1000, 500, this.p);
+    
+            new Wall(-11.5, 500, -1000, 120, this.p);
+            new Wall(11.5, 500,  1000, 120, this.p);
+    
+            new Wall(100, -380,   1000, -300, this.p);
+            new Wall(-11.5, -380,   -1000, -300, this.p);
+            new Wall(-1000, -380, 1000, -1000, this.p);
+    
+            new Wall(-1000, 500, -50, 2000, this.p);
+            new Wall(50, 500, 1000, 2000, this.p);
+            new Wall(-1000, 580, 1000, 2000, this.p);
         }
     
         usableFloorImage = [
@@ -67,25 +104,7 @@ class Scene{
         this.floor = new RandFloorTile(usableFloorImage);
         this.baseFloor = new RandFloorTile(baseFloorImage);
         
-        
-
-        this.player = new Player(this.startingPlayerPosition, this.p);
-        this.bossManager = new BossManager(this.p);
-        
         this.mainCamera = new MainCamera(this.p);
-
-        new Wall(-1000, -120,   -11.5, -300, this.p);
-        new Wall(1000, -120,    11.5, -300, this.p);
-
-        new Wall(-1000, -300, -200, 1000, this.p);
-        new Wall(200, -300,   1000, 1000, this.p);
-
-        new Wall(-11.5, 1000, -1000, 120, this.p);
-        new Wall(11.5, 1000,  1000, 120, this.p);
-
-        new Wall(100, -380,   1000, -300, this.p);
-        new Wall(-11.5, -380,   -1000, -300, this.p);
-        new Wall(-1000, -380, 1000, -1000, this.p);
         
         if(runNumber == 0 && getDeathCount()== 1){
             this.player.createDialougue([
@@ -116,23 +135,41 @@ class Scene{
             ]);
         }
 
-        if(runNumber == 0 && getDeathCount() == 4)
+        if(runNumber == 0 && hardMode && getDeathCount() == 0)
+            this.player.createDialougue([
+                new Quote(["Now I can play in hard mode!"], 1),
+                new Quote(["This will be much more difficult."], 3),
+                new Quote([''], 5.5)
+            ]); 
+        else if(runNumber == 0 && getDeathCount() == 4)
             this.player.createDialougue([
                 new Quote(["I got this."], 1),
                 new Quote([''], 2)
-            ]);        
-
-        if(runNumber == 0 && getDeathCount() == 6)
+            ]);   
+        else if(runNumber == 0 && getDeathCount() == 6)
             this.player.createDialougue([
                 new Quote(["One more try."], 1),
                 new Quote([''], 2)
             ]);
-        
-        if(runNumber == 0 && getDeathCount() == 8)
+        else if(runNumber == 0 && getDeathCount() == 8)
             this.player.createDialougue([
                 new Quote(["Why don't they just lock the door?"], 1),
                 new Quote([''], 3)
             ]);
+
+        if(runNumber == 4) {
+            this.displayFloor = false;
+
+            this.sceneTriggers.push(new SceneTrigger(24, 549, 26, 551, 'destroySamsComputer'));
+            let buttonCollider = new BoxCollider(new PhysicsObject(new Vector(25, 525)), 17, 17);
+            buttonCollider.static = true;
+            buttonCollider.layer = 'wall'
+        }
+
+        if(hardMode) {
+            this.sceneTriggers.push(new SceneTrigger(-300, -120, 300, 120, 'spawnBoss'));
+            return;
+        }
 
         if(runNumber == 0 && getDeathCount() == 0)
         {
@@ -575,6 +612,35 @@ class Scene{
         ]);
         this.player.freeze();
         time.delayedFunction(this.player, 'unfreeze', 3.2);
+        time.delayedFunction(this, 'endCutscene', 3.7);
+    }
+
+    destroySamsComputer(){
+        console.log("Runtime upon button press:", time.trueRunTime);
+
+        this.updateSong(creditsSong, 1.0, true);
+        time.startSynch();
+
+        this.player.freeze();
+        this.coverScreenColor = this.p.color(255, 255, 255);
+        this.coverScreenChange = 0.9;
+
+        time.delayedFunction(this, 'throwErrorUponSamsDeath', 1.2);
+        time.delayedFunction(this, 'killSceneUponSamsComputerDeath', 12.82);
+    }
+
+    throwErrorUponSamsDeath(){
+        this.transition = new TypedTransition([
+            new Quote('ERROR!\nUNCAUGHT!FATAL!USERNOTFOUND!\nSOLVEIMMED10011100010100000000000000000000000000000', 0),
+        ], this.p, true);
+        this.transition.typingSpeed = 90;
+    }
+
+    killSceneUponSamsComputerDeath(){
+        console.log("Runtime at end of scene:", time.trueRunTime);
+        this.gameOver = true;
+        this.runCredits = true;
+        //this.sceneEndText = ' '
     }
 
     spawnBoss(){
@@ -610,6 +676,8 @@ class Scene{
             }
             return;
         }
+
+        this.coverScreen += this.coverScreenChange;
     
         let start = new Date();
         for(let stepNum = 0; stepNum < steps; stepNum++){
@@ -667,13 +735,18 @@ class Scene{
             this.floor.updateImage();
         }
 
+        if(runNumber != 5){
+            let buttonIndex = Math.floor((6*time.runTime) % 4);
+            bigRedButtonImage[buttonIndex].draw(25, 537.5);
+        }
+
         for(let i in this.walls){ this.walls[i].updateImage(); }
         this.player.updateImage();
         this.bossManager.updateImage();
         for(let i in this.npcs){        this.npcs[i].updateImage(); }
         for(let i in this.bullets){     this.bullets[i].updateImage(); }
         for(let i in this.textboxes){   this.textboxes[i].updateImage(); }
-        for(let i in this.otherImages){ this.otherImages[i].updateImage(); }
+        for(let i in this.uiElements){ this.uiElements[i].updateImage(); }
         
         let end = new Date();
         return end-start;
@@ -700,9 +773,22 @@ class Scene{
         this.p.pop();
         */
         if(this.transition) this.transition.update();
+
+        this.p.push();
+        {
+            let myColor = this.coverScreenColor;
+            myColor.setAlpha(this.coverScreen);
+            this.p.background(myColor);
+        }
+        this.p.pop();
         
         let end = new Date();
         return end-start;
+    }
+
+    resetAndSetupImages(){
+        for(let i of this.walls) i.resetAndSetupImage();
+        for(let i of this.uiElements) i.resetAndSetup();
     }
 
     updateSongVolumes(){
@@ -724,6 +810,25 @@ class Scene{
         songSwitchTime += time.deltaTime;
     }
 
+
+    updateSong(song, volume = 1.0, instant = false){
+            
+        let oldSong = currentSong;
+        if(oldSong == song && song) return;
+        if (oldSong == songs[runNumber]) return;
+
+        if(oldSong) console.log(oldSong);
+
+        if(instant) playSongInstant(song, oldSong, volume);
+        else if(song) playSong(song, oldSong, volume);
+        else{ playSong(songs[runNumber], oldSong, volume); }
+        
+    }
+
+    endSong(){
+        playSong(null, currentSong, 1.0);
+    }
+
     killBulletsInRange(position, radius){
         for(let i of this.bullets){
             let positionDifference = position.subtract(i.position);
@@ -731,19 +836,6 @@ class Scene{
                 i.dissapate();
             }
         }
-    }
-
-
-    updateSong(song, volume = 1.0, instant = false){
-            
-        let oldSong = currentSong;
-        if(oldSong == song && song) return;
-        else if (oldSong == songs[runNumber]) return;
-
-        if(instant) playSongInstant(song, oldSong, volume);
-        else if(song) playSong(song, oldSong, volume);
-        else{ playSong(songs[runNumber], oldSong, volume); }
-        
     }
 
     createHealthBar(parent, maxHealth, isPlayer=false){
@@ -824,6 +916,7 @@ class Scene{
 
             if(this.playerIsDead){
                 deathDifficulties.push(difficulty);
+                deathBosses.push(this.bossManager.bosses[0].name);
 
                 runSpeedBoost =   1;
                 dashSpeedBoost =  1;
@@ -838,16 +931,41 @@ class Scene{
                 functionObject.createScene();
             }
             else{
-                killScene(new TypedTransition([
-                    new Quote('loading...', 0)
-                ], this.p), 1.5);
+                if(this.runCredits){
+                    runNumber = 0;
+                    difficulty = 1;
+                    hardMode = true;
+                    deathBosses = []
+                    deathDifficulties = []
+
+                    let newTransition = new TypedTransition(
+                    [
+                        new Quote('This Immortal Coil', 0, castleImages[0], new Vector(0, -1300), new Vector(0, 200)),
+                        new Quote('A game by Keaton Mitchell', 3.205, castleImages[0], new Vector(0, -659), new Vector(0, 200)), 
+                        new Quote('Thanks to all my playtesters,\nthe game is finally out.', 6.41, castleImages[1], new Vector(0, 150), new Vector(0, -50)),
+                        new Quote('Israel Sanchez, Harper Mitchell,\nKnox Crain, and many, many more.', 12.82, castleImages[2], new Vector(100, 100), new Vector(-30, -30)),
+                        new Quote('Script written by Mitch Mitchell\nIdeas endured by Audrey Mitchell', 19.23, castleImages[3], new Vector(0, 50), new Vector(0, -15)),
+                        new Quote('Special Thanks to Deuce Broom for\n fixing a fatal error before release.', 25.64, castleImages[4]),
+                        new Quote('Thanks for playing!', 32.05)
+                    ], this.p);
+                    newTransition.textSize = 50;
+                    newTransition.typingSpeed = 70;
+                    killScene(newTransition, 38.46);
+
+                }
+                else{
+                    killScene(new TypedTransition([
+                        new Quote(this.sceneEndText, 0)
+                    ], this.p), 1.5);
+                }
             }
         }
     }
 
     drawImage(x, y, img, rotation = 'right', transparency = 0){
 
-        if(this.screenIsBlack) return;
+        if(this.coverScreen == 1) return;
+
         {
             this.p.push();
         

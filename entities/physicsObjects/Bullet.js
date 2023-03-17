@@ -4,7 +4,7 @@ class Bullet extends PhysicsObject{
 
         super(startingPosition, startingVelocity);
         
-        if(scene.bulletsCannotSpawn && cannotBeCancelled) {
+        if(scene.bulletsCannotSpawn && cannotBeCancelled || runNumber == 5) {
             this.isStillAlive = false;
             return;
         }

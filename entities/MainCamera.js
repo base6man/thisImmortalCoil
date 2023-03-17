@@ -182,11 +182,27 @@ class MainCamera{
     }
 
     isOffScreen(image, x, y){
+        return false;
+        /*
+        let imageRightEdge =  x + image.width / 2 / pixelSize;
+        let imageLeftEdge =   x - image.width / 2 / pixelSize;
+        let imageBottomEdge = y + image.height / 2 / pixelSize;
+        let imageTopEdge =    y - image.height / 2 / pixelSize;
+
+        let returnValue = !(
+            imageTopEdge > this.bottomEdge &&
+            imageBottomEdge < this.topEdge &&
+            imageLeftEdge > this.rightEdge && 
+            imageRightEdge < this.leftEdge
+        );
+        */
+        /*
         return !(
-            x < this.width*pixelSize + image.width/4 && 
+            x < this.width + image.width/4*pixelSize && 
             x > -image.width/4*pixelSize && 
-            y < this.height*pixelSize + image.height/4 && 
+            y < this.height + image.height/4*pixelSize && 
             y > -image.height/4*pixelSize
         );
+        */
     }
 }

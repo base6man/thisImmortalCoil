@@ -17,8 +17,8 @@ class HealthBar{
         this.shouldDisplay = false;
         this.displayingPreviousValue = true;
 
-        this.index = scene.otherImages.length;
-        scene.otherImages.push(this);
+        this.index = scene.uiElements.length;
+        scene.uiElements.push(this);
 
         this.healthTileWidth = 1;
         this.healthTileHeight = 2;
@@ -33,6 +33,11 @@ class HealthBar{
         this.previousHealthCanvas.name = 'previousHealthBar';
 
         this.isFirstFrame = true;
+    }
+
+    resetAndSetup(){
+        this.createCanvases();
+        this.doFirstFrame();
     }
 
     createCanvases(){
@@ -124,15 +129,15 @@ class HealthBar{
 
     delete(){
         
-        scene.otherImages.splice(this.index, 1);
+        scene.uiElements.splice(this.index, 1);
         time.stopFunctions(this, null);
 
-        for(let i = this.index; i < scene.otherImages.length; i++){
-          scene.otherImages[i].moveDownOneIndex();
+        for(let i = this.index; i < scene.uiElements.length; i++){
+          scene.uiElements[i].moveDownOneIndex();
         }
 
-        for(let i in scene.otherImages){
-            console.assert(scene.otherImages[i].index == i);
+        for(let i in scene.uiElements){
+            console.assert(scene.uiElements[i].index == i);
         }
     }
 
@@ -208,7 +213,6 @@ class HudHealthBar extends HealthBar{
 
     updateCanvas(image, health, myColor = this.color){
 
-        image.setup();
         image.addBox(1, 1, this.totalWidth-3, this.totalHeight-2, this.p.color(125, 50, 0));
         image.addBox(this.totalWidth-2, 2, 1, this.totalHeight-4, this.p.color(125, 50, 0));
         image.addBox(2, 2, this.totalWidth-5, this.totalHeight-4, 255);

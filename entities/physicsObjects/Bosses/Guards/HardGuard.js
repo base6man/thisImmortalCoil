@@ -123,20 +123,13 @@ class HardGuard extends Guard{
 
     getHitAndDie(){
         super.getHitAndDie();
-        scene.updateSong(this.song, 0.6, true);
-        if(this.addTwoHealth){
-            
-            /*
-            scene.npcs.push(new Npc('guard', this.position, voiceEffects.dot, 
-            [
-                "Not yet.", 0.8,
-                "delete", 2.2
-            ]));
-            */
 
+        if(this.addTwoHealth){
+            scene.updateSong(this.song, 0.6, true);
             time.delayedFunction(scene, "blinkOutToNewScene", 0.2);
         }
         else{
+            scene.endSong();
             scene.displayFloor = true;
             scene.finalDotOutro(this.position);
         }

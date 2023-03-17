@@ -10,17 +10,21 @@ class Player extends PhysicsObject{
         this.name = 'player';
 
         this.speedMult = 70;
+        if(runNumber == 5) this.speedMult = 40;
 
         this.canDash = true;
         this.stopDashSpeed = 0.3;
+        if(runNumber == 5) this.stopDashSpeed = 0.5;
 
         this.dashTime = 0.25;
         this.isDashing = false;
+        if(runNumber == 5) this.dashTime = 0.12;
         
         this.timeAtDashStart = 0;
         this.timeOfLastHit = 0;
 
         this.stopDashTimeMultiplier = 1;
+        if(runNumber == 5) this.stopDashTimeMultiplier = 2;
 
         this.phaseThrough = false;
         
@@ -73,8 +77,11 @@ class Player extends PhysicsObject{
     }
 
     get runSpeed(){         return 0.8 * (1 + runSpeedBoost/2); }
-    get dashSpeed(){        return 3.0 * (1 + dashSpeedBoost/2); }
     get endTeleportSpeed(){ return 4.2; }
+    get dashSpeed(){        
+        if(runNumber == 5) return 3;
+        return 3.0 * (1 + dashSpeedBoost/2); 
+    }
 
     get animationName(){
         if(this.input.x > 0.5 && this.input.y > 0.5) return 'upRight';
@@ -124,10 +131,15 @@ class Player extends PhysicsObject{
     }
     
     updateImage(){
-        if(this.ghost) this.ghost.updateImage();
-
-        this.bodyImage.updateImage();
-        this.headImage.updateImage();
+        if(runNumber == 5){
+            playerHumanImage[0].draw(this.position.x, this.position.y);
+        }
+        else{
+            if(this.ghost) this.ghost.updateImage();
+    
+            this.bodyImage.updateImage();
+            this.headImage.updateImage();
+        }
 
         if(this.textbox) this.textbox.update(this.textboxPosition.x, this.textboxPosition.y);
     }
@@ -177,7 +189,7 @@ class Player extends PhysicsObject{
             this.isDashing = true;
             this.timeAtDashStart = time.runTime;
             
-            if(!this.ghost) this.ghost = new Ghost(this.ghostPosition, new Vector(0, 0), this.p, true);
+            if(!this.ghost && runNumber != 5) this.ghost = new Ghost(this.ghostPosition, new Vector(0, 0), this.p, true);
 
             if(this.dashType == 1){
                 this.speed = 4;
@@ -277,16 +289,19 @@ class Player extends PhysicsObject{
     
     teleport(){
         if(this.freezePosition) return;
+        if(runNumber == 5) return;
         
         if(!this.teleporting && this.ghostKeysPressed()){
             this.teleporting = true;
 
             this.teleportStartTime = time.runTime;
 
-            if(!this.ghost) 
-                this.ghost = new Ghost(this.ghostPosition, this.velocity, this.p);
-            else{ 
-                this.ghost.startControlling();
+            if(runNumber != 5){
+                if(!this.ghost) 
+                    this.ghost = new Ghost(this.ghostPosition, this.velocity, this.p);
+                else{ 
+                    this.ghost.startControlling();
+                }
             }
 
             this.ghostCanRelease = false;
@@ -398,7 +413,7 @@ class Player extends PhysicsObject{
             if(this.attackObject && this.attackObject.isStillAlive) this.attackObject.dissapate();
             // Offset done later
             this.attackObject = new Bullet(7.5, this.position, new Vector(0, 0), true);
-            this.attackObject.makePlayerAttack(this);
+            if(this.attackObject.isStillAlive) this.attackObject.makePlayerAttack(this);
             time.delayedFunction(this, 'endAttack', duration);
         }
 
@@ -415,7 +430,7 @@ class Player extends PhysicsObject{
 
     endAttack(){
         time.stopFunctions(this, 'endAttack');
-        if(this.attackObject) this.attackObject.dissapate();
+        if(this.attackObject && this.attackObject.isStillAlive) this.attackObject.dissapate();
     }
 
     bossIsKilled(boss, canHeal = true){
@@ -547,7 +562,7 @@ class Player extends PhysicsObject{
         let knockbackVector = this.position.subtract(otherPosition);
         knockbackVector.magnitude = this.knockbackSpeed * this.speedMult;
 
-        if(!this.ghost) {
+        if(!this.ghost && runNumber != 5) {
             this.ghost = new Ghost(this.ghostPosition, new Vector(0, 0), this.p, true);
 
             let ghostKnockbackVector = knockbackVector.copy();

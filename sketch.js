@@ -21,8 +21,11 @@ let attackImage, diagonalAttackImage, stillAttackImage;
 let attackDissapateImage, diagonalDissapateImage;
 let shieldAttackImage, shieldDiagonalImage;
 let playerAttackImage, playerDiagonalAttackImage, playerAttackDissipateImage;
+let playerHumanImage;
 
+let bigRedButtonImage;
 let usableFloorImage, rootFloorImage, floorImageList, dirtyFloorImage;
+
 let playerHeads;
 let playerRunRight, playerIdle, playerRunLeft, playerRunUp, playerRunDown, playerRunUpRight, playerRunUpLeft;
 
@@ -53,7 +56,7 @@ let globalTimescale = 0.9/lagMultiplier;
 let steps = 2;
 let collisionSteps = 2;
 
-let pixelSize = 5;
+let pixelSize;
 
 let maxPlayerHealth = 3;
 let runSpeedBoost   = 1;
@@ -62,7 +65,7 @@ let ghostSpeedBoost = 1;
 
 let cutsceneMult = 1.25;
 
-let songs, introSong;
+let songs, creditsSong;
 let currentSong, currentSongName, previousSong;
 let songVolume = 0.5; // 0.5
 
@@ -77,6 +80,8 @@ let songSwitchTime;
 let difficulty = 1;
 let runNumber = 0;
 let deathDifficulties = []
+let hardMode = false;
+let deathBosses = []
 
 function getDeathCount(){ 
   return deathDifficulties.length; 
@@ -203,7 +208,8 @@ let layerMap = [
   {a: 'ghost',      b: 'wall'},
   {a: 'shieldGhost',b: 'enemyAttack'},
   {a: 'shieldGhost',b: 'blueBullet'},
-  {a: 'npc',        b: 'playerAttack'}
+  {a: 'npc',        b: 'playerAttack'},
+  {a: 'playerAttack', b: 'attackTrigger'}
 ]
 
 function isBetween(num, a, b) {
@@ -278,6 +284,7 @@ function playSong(song, oldSong, volume){
 }
 
 function playSongInstant(song, oldSong, volume){
+  //if(oldSong) console.log(oldsong);
   if(song){
     if(currentSongName == song) return;
 
@@ -286,6 +293,7 @@ function playSongInstant(song, oldSong, volume){
 
     if(volume) currentSong.volume = volume;
     currentSong.play();
+    currentSong.volume *= songVolume;
     currentSong.loop = true;
     
 
@@ -295,6 +303,7 @@ function playSongInstant(song, oldSong, volume){
     previousSong = oldSong;
     oldSong.pause();
     oldSong.currentTime = 0;
+    console.log(previousSong);
   }
 }
 
@@ -355,13 +364,13 @@ const sketch = (p) => {
   
     
     dirtyFloorImage = [
-      {image: p.loadImage("images/floorImages/dirtyTile.png"), spawnRate: 2},
-      {image: p.loadImage("images/floorImages/outletTile.png"), spawnRate: 0.1},
-      {image: p.loadImage("images/floorImages/scifiTile.png"), spawnRate: 1},
-      {image: p.loadImage("images/floorImages/electricalTile.png"), spawnRate: 0.1},
-      {image: p.loadImage("images/floorImages/stoneTile.png"), spawnRate: 0.2},
-      {image: p.loadImage("images/floorImages/squareTile.png"), spawnRate: 0.4},
-      {image: p.loadImage("images/floorImages/susTile.png"), spawnRate: 0.02}
+      {image: p.loadImage("images/floorImages/dirtyFloor/dirtyTile.png"), spawnRate: 2},
+      {image: p.loadImage("images/floorImages/dirtyFloor/outletTile.png"), spawnRate: 0.1},
+      {image: p.loadImage("images/floorImages/dirtyFloor/scifiTile.png"), spawnRate: 1},
+      {image: p.loadImage("images/floorImages/dirtyFloor/electricalTile.png"), spawnRate: 0.1},
+      {image: p.loadImage("images/floorImages/dirtyFloor/stoneTile.png"), spawnRate: 0.2},
+      {image: p.loadImage("images/floorImages/dirtyFloor/squareTile.png"), spawnRate: 0.4},
+      {image: p.loadImage("images/floorImages/dirtyFloor/susTile.png"), spawnRate: 0.02}
     ]
     
 
@@ -375,6 +384,13 @@ const sketch = (p) => {
       p.loadImage("images/floorImages/cleanFloor/rustedTile2.png"),
       p.loadImage("images/floorImages/cleanFloor/electricalTile.png"),
       p.loadImage("images/floorImages/cleanFloor/nullTile.png")
+    ]
+
+    bigRedButtonImage = [
+      p.loadImage("images/floorImages/bigRedbutton.png"),
+      p.loadImage("images/floorImages/bigRedbutton1.png"),
+      p.loadImage("images/floorImages/bigRedbutton2.png"),
+      p.loadImage("images/floorImages/bigRedbutton1.png")
     ]
 
     attackImage = [
@@ -405,6 +421,10 @@ const sketch = (p) => {
     playerAttackDissipateImage = [
       p.loadImage("images/attackImages/playerAttackDissapate(0).png"),
       p.loadImage("images/attackImages/playerAttackDissapate(1).png")
+    ]
+
+    playerHumanImage = [
+      p.loadImage("images/playerImages/samuraiNew.png")
     ]
   
     
@@ -513,7 +533,7 @@ const sketch = (p) => {
     ]
   
     
-    introSong = "sounds/intro.wav";
+    creditsSong = "sounds/mortimerKeep.wav";
     
     whoosh = "sounds/whoosh.wav";
     voiceEffects = {
@@ -531,7 +551,10 @@ const sketch = (p) => {
     // Create the canvas
     time = new Time(p);
     functionObject = new FunctionObject(p);
+
     p.createCanvas(p.windowWidth, p.windowHeight);
+    pixelSize = Math.floor((p.width + p.height)/500);
+
     directions = [
       'left', 'right', 'up', 'down', 'normal',
       'downLeft', 'downRight', 'upLeft', 'upRight'
@@ -546,11 +569,12 @@ const sketch = (p) => {
     }
   
     allImages = [
-      floorImageList,
+      floorImageList, bigRedButtonImage,
       playerIdle, playerRunLeft, playerRunUp, playerRunUpRight, playerRunUpLeft, playerRunDown,
       attackImage, diagonalAttackImage, stillAttackImage, attackDissapateImage, 
       shieldAttackImage, shieldDiagonalImage,
       playerAttackImage, playerDiagonalAttackImage, playerAttackDissipateImage,
+      playerHumanImage,
       guardIdle, guardAttack, guardDiagonal,
       guardRunSide, guardRunDown, samuraiRun,
       soldierImage, soldierDiagonal, soldierAttack, soldierAttackDiagonal,
@@ -651,14 +675,14 @@ const sketch = (p) => {
         new Quote('There is nothing for you here.', 3.2)
       ], p);
   
-      playSong(introSong);
+      playSong(creditsSong);
     }
     //getAudioContext().suspend();
   };
     
   // Start draws all images
   // Do not move this to setup
-  function start(){
+  function setupImages(){
     for(let i in allImages){
       for(let j in allImages[i]){
         allImages[i][j].setup();
@@ -706,7 +730,7 @@ const sketch = (p) => {
       }
     
       if(isFirstFrame){
-        start();
+        setupImages();
         isFirstFrame = false;
       }
       
@@ -738,6 +762,11 @@ const sketch = (p) => {
 
   p.windowResized = () => {
     p.resizeCanvas(p.windowWidth, p.windowHeight);
+    pixelSize = Math.floor((p.width + p.height)/500);
+
+    functionObject.resetImages();
+    if(scene) scene.resetAndSetupImages();
+    setupImages();
   }
 }
 

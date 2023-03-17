@@ -1,5 +1,5 @@
 class SceneTrigger extends PhysicsObject{
-    constructor(x1, y1, x2, y2, functionName){
+    constructor(x1, y1, x2, y2, functionName, isAttackTrigger = false){
         let x = (x1 + x2)/2;
         let y = (y1 + y2)/2;
         super(new Vector(x, y));
@@ -10,7 +10,9 @@ class SceneTrigger extends PhysicsObject{
         this.collider = new BoxCollider(this, this.width, this.height);
         this.collider.static = true;
         this.collider.isTrigger = true;
-        this.collider.layer = 'sceneTrigger';
+
+        if(isAttackTrigger) this.collider.layer = 'npc';
+        else{               this.collider.layer = 'sceneTrigger'; }        
         
         scene.sceneTriggers.push(this);
 
@@ -21,6 +23,10 @@ class SceneTrigger extends PhysicsObject{
         console.log(this.functionName);
         time.delayedFunction(scene, this.functionName, 0);
         this.delete();
+    }
+
+    onColliderCollision(other){
+        this.onColliderCollision(other);
     }
     
     delete(){

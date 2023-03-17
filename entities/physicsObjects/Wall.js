@@ -24,6 +24,11 @@ class Wall extends PhysicsObject{
         scene.walls.push(this);
     }
 
+    resetAndSetupImage(){
+        this.canvas.reset();
+        this.canvas.setup();
+    }
+
     updateImage(){
         this.canvas.draw(this.position.x, this.position.y);
     }

@@ -280,11 +280,23 @@ class Boss extends PhysicsObject{
     }
 
     get difficulty(){
-        return difficulty * this.difficultyMultiplier;
+        let newDifficultyMult = this.difficultyMultiplier * (1.2 - this.timesPlayerDiedToThis/10);
+
+        if(hardMode) return difficulty + 3;
+        return difficulty * newDifficultyMult;
     }
 
     get globalDifficulty(){
         return Math.round(difficulty*2)/2;
+    }
+
+    get timesPlayerDiedToThis(){
+        let count = 0;
+        for(let i of deathBosses){
+            if(i == this.name) count++
+        }
+        if(count == 0) count--
+        return count;
     }
 
     get ghost(){
