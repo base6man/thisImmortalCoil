@@ -83,6 +83,7 @@ let difficulty = 1;
 let runNumber = 0;
 
 let saveFileContents;
+/*
 fs.readFile("lib/saveData.txt", function(err, data) {
     if(err) return console.error(err);
     saveFileContents = data.toString();
@@ -94,6 +95,7 @@ fs.readFile("lib/saveData.txt", function(err, data) {
     if(fileArray[2]) hardMode = fileArray[2];
     console.log(deathDifficulties, deathBosses, hardMode)
 });
+*/
 
 let deathDifficulties = []
 let hardMode = false;
@@ -565,13 +567,13 @@ const sketch = (p) => {
       technician: "sounds/voiceTechnician.wav",
       surgeon: "sounds/voiceSurgeon.wav"
     }
+    functionObject = new FunctionObject(p);
     
   }
 
   p.setup = () => {
     // Create the canvas
     time = new Time(p);
-    functionObject = new FunctionObject(p);
 
     p.createCanvas(p.windowWidth, p.windowHeight);
     pixelSize = Math.floor((p.width + p.height)/500);
