@@ -187,6 +187,8 @@ class Scene{
         {
             //new Wall(-20, -300, 20, -280, p);
 
+            this.isInCutscene = true;
+
             this.transition = new TypedTransition([
                 new Quote('Initializing...', 0),
                 new Quote('Compiling Memory Cache...', 3.5),
@@ -214,7 +216,8 @@ class Scene{
             ]);
             this.player.freeze();
             time.delayedFunction(this.player, 'unfreeze', 3.5+4.2+4.5+4.5+4.0);
-
+            time.delayedFunction(this, 'endCutscene', 3.5+4.2+4.5+4.5+4.0);
+            
             this.sceneTriggers.push(new SceneTrigger(-300, -120, 300, 120, 'dotIntro'));
     
             this.updateSong('sounds/beep(dot).wav');
@@ -715,13 +718,15 @@ class Scene{
                 }
             }
             
+            /*
             if(KeyReader.z) time.hitStop(9999);
             if(KeyReader.x) time.stopHitStop();
             if(KeyReader.c) time.setSpeed(2);
             if(KeyReader.v) time.setSpeed(10);
             if(KeyReader.b) time.setSpeed(100);
+            */
 
-            if(KeyReader.space && this.isInCutscene){
+            if((KeyReader.holdSpace || gamepadAPI.buttonPressed('A', true)) && this.isInCutscene){
                 time.setSpeed(8);
                 this.fastForwarding = true;
             }

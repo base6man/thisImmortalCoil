@@ -49,6 +49,7 @@ function createWindow() {
     //let deathBosses = remote.getGlobal('deathBosses');
     //let hardMode = remote.getGlobal('hardMode');
     
+    /*
     if(global.myGlobalVariable){
 
       fs.truncate('lib/SavedData.txt', 0, function(){console.log('done')})
@@ -60,6 +61,7 @@ function createWindow() {
           }
       });
     }
+    */
     
   })
 }

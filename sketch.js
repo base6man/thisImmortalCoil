@@ -84,6 +84,7 @@ let songSwitchTime;
 let difficulty = 1;
 let runNumber = 0;
 
+/*
 try{
   fs.readFile("lib/SavedData.txt", function(err, data) {
       if(err) return console.error(err);
@@ -100,6 +101,7 @@ try{
 catch{
   console.log("Nope! No save!")
 }
+*/
 
 let deathDifficulties = []
 let hardMode = false;
