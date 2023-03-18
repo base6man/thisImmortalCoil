@@ -55,6 +55,8 @@ class Scene{
         this.glitchSeedIndex;
 
         time.stopSynch();
+
+        this.floorImagesDrawn = 0;
     }
 
     // Setup initializes variables that require operations
@@ -147,8 +149,8 @@ class Scene{
 
         if(runNumber == 0 && hardMode && getDeathCount() == 0)
             this.player.createDialougue([
-                new Quote(["Now I can play in hard mode!"], 1),
-                new Quote(["This will be much more difficult."], 3),
+                new Quote(["Hard mode unlocked!"], 1),
+                new Quote(["To access, just keep playing."], 3),
                 new Quote([''], 5.5)
             ]); 
         else if(runNumber == 0 && getDeathCount() == 4)
@@ -736,8 +738,10 @@ class Scene{
         // I hate it; I would make it in a different order, but that can't happen
 
         this.glitchSeedIndex = 0;
+        this.floorImagesDrawn = 0;
 
         if(this.playerIsDead){
+            this.p.background(0)
             this.player.updateImage();
             this.mainCamera.updateImage();
             this.bossManager.updateImage();
@@ -754,7 +758,8 @@ class Scene{
         
         if(!this.buttonPressed){
             let buttonIndex = Math.floor((6*time.runTime) % 4);
-            bigRedButtonImage[buttonIndex].draw(25, 537.5);
+            //bigRedButtonImage[buttonIndex].draw(25, 537.5);
+            bigRedButtonImage[buttonIndex].draw(25, -337.5);
         }
         else{
             bigRedButtonImage[4].draw(25, 537.5)
@@ -767,7 +772,7 @@ class Scene{
         for(let i in this.bullets){     this.bullets[i].updateImage(); }
         for(let i in this.textboxes){   this.textboxes[i].updateImage(); }
         for(let i in this.uiElements){ this.uiElements[i].updateImage(); }
-        
+
         let end = new Date();
         return end-start;
     }
@@ -992,9 +997,11 @@ class Scene{
 
                 }
                 else{
+                    console.log(scene);
                     killScene(new TypedTransition([
                         new Quote(this.sceneEndText, 0)
                     ], this.p), 1.5);
+                    console.log(scene);
                 }
             }
 
@@ -1016,7 +1023,7 @@ class Scene{
         this.isGlitched = false;
     }
 
-    drawImage(x, y, img, rotation = 'right', transparency = 0){
+    drawImage(x, y, img, rotation = 'right', transparency = 0, name){
 
         if(this.coverScreen == 1) return;
 
@@ -1031,6 +1038,12 @@ class Scene{
         
             console.assert(isNumber(img.width) && isNumber(img.height));
         
+            // After this we get some weird rotation stuff
+            if(scene.mainCamera.isOffScreen(img, x, y)) {
+                this.p.pop();
+                return;
+            }
+
             // Map so that 1 unit is 1 pixel
             let x0 = x * pixelSize;
             let y0 = y * pixelSize;
@@ -1042,11 +1055,6 @@ class Scene{
             let x2 = x0 + (this.p.width/2 - scene.mainCamera.pixelPosition.x - img.width/2);
             let y2 = y1 + (this.p.height/2 - (-scene.mainCamera.pixelPosition.y) - img.height/2);
         
-            // After this we get some weird rotation stuff
-            if(scene.mainCamera.isOffScreen(img, x2, y2)) {
-                this.p.pop();
-                return;
-            }
         
             // Adjust for image rotation
             let x4, y4;
@@ -1078,6 +1086,7 @@ class Scene{
         
             if(transparency != 0) this.p.tint(255, 255*(1-transparency));
             this.p.image(img, x4, y4);
+            if(name == 'floor') this.floorImagesDrawn++
             
             let endTime = new Date();
         

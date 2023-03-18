@@ -51,9 +51,9 @@ function createWindow() {
     
     if(global.myGlobalVariable){
 
-      fs.truncate('lib/saveData.txt', 0, function(){console.log('done')})
+      fs.truncate('lib/SaveData.txt', 0, function(){console.log('done')})
               
-      fs.appendFile("lib/saveData.txt", global.myGlobalVariable, function (err) {
+      fs.appendFile("lib/SaveData.txt", global.myGlobalVariable, function (err) {
           if (err) return console.error(err);
           else{
              console.log("The file is updated with the given data")

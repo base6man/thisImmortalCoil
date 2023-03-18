@@ -182,27 +182,28 @@ class MainCamera{
     }
 
     isOffScreen(image, x, y){
-        return false;
-        /*
+        //return false;
+        
         let imageRightEdge =  x + image.width / 2 / pixelSize;
         let imageLeftEdge =   x - image.width / 2 / pixelSize;
-        let imageBottomEdge = y + image.height / 2 / pixelSize;
-        let imageTopEdge =    y - image.height / 2 / pixelSize;
+        let imageBottomEdge = y - image.height / 2 / pixelSize;
+        let imageTopEdge =    y + image.height / 2 / pixelSize;
 
         let returnValue = !(
             imageTopEdge > this.bottomEdge &&
             imageBottomEdge < this.topEdge &&
-            imageLeftEdge > this.rightEdge && 
-            imageRightEdge < this.leftEdge
+            imageLeftEdge < this.rightEdge && 
+            imageRightEdge > this.leftEdge
         );
-        */
-        /*
+        //console.log(imageTopEdge > this.bottomEdge, imageBottomEdge < this.topEdge, imageLeftEdge > this.rightEdge, imageRightEdge < this.leftEdge)
+        return returnValue;
+        
         return !(
             x < this.width + image.width/4*pixelSize && 
             x > -image.width/4*pixelSize && 
             y < this.height + image.height/4*pixelSize && 
             y > -image.height/4*pixelSize
         );
-        */
+        
     }
 }

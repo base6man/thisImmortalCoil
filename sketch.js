@@ -50,6 +50,8 @@ let clocksmithImages = {}
 let attackImages = {}
 let guardImages = {}
 
+let imagesExist = false;
+
 let lagMultiplier = 1;
 let time;
 let isFirstFrame = true;
@@ -82,20 +84,22 @@ let songSwitchTime;
 let difficulty = 1;
 let runNumber = 0;
 
-
-/*
-fs.readFile("lib/saveData.txt", function(err, data) {
-    if(err) return console.error(err);
-    let saveFileContents = data.toString();
-
-    let fileArray = saveFileContents.split(/\r?\n/);
-
-    if(fileArray[0]) deathDifficulties = fileArray[0].split(",");
-    if(fileArray[1]) deathBosses = fileArray[1].split(",");
-    if(fileArray[2]) hardMode = fileArray[2] === 'true';
-    console.log(deathDifficulties, deathBosses, hardMode)
-});
-*/
+try{
+  fs.readFile("lib/SaveData.txt", function(err, data) {
+      if(err) return console.error(err);
+      let saveFileContents = data.toString();
+  
+      let fileArray = saveFileContents.split(/\r?\n/);
+  
+      if(fileArray[0]) deathDifficulties = fileArray[0].split(",");
+      if(fileArray[1]) deathBosses = fileArray[1].split(",");
+      if(fileArray[2]) hardMode = fileArray[2] === 'true';
+      console.log(deathDifficulties, deathBosses, hardMode)
+  });
+}
+catch{
+  console.log("Nope! No save!")
+}
 
 let deathDifficulties = []
 let hardMode = false;
@@ -615,6 +619,8 @@ const sketch = (p) => {
       }
     }
 
+    imagesExist = true;
+
     rootFloorImage = {
       simple: floorImageList[0],
       cracked: floorImageList[1],
@@ -731,6 +737,8 @@ const sketch = (p) => {
       return;
     }
   
+
+
     for(let lagCount = 0; lagCount < lagMultiplier; lagCount++){
   
       let startTime = new Date();
@@ -745,6 +753,19 @@ const sketch = (p) => {
       if(isFirstFrame){
         setupImages();
         isFirstFrame = false;
+      }
+    
+      if(!transition && !scene.transition){
+        p.push();
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(40);
+        p.textLeading(80);
+        p.fill(255);
+        p.noStroke();
+        p.textFont(transitionFont);
+  
+        p.text("The game has glitched.\nHit the fullscreen button to fix.\nYou can then hit it again if you want.", p.width/2, p.height-150);
+        p.pop();
       }
       
       if(scene){
@@ -767,9 +788,11 @@ const sketch = (p) => {
     p.resizeCanvas(p.windowWidth, p.windowHeight);
     pixelSize = Math.floor((p.width + p.height)/500);
 
-    functionObject.resetImages();
-    if(scene) scene.resetAndSetupImages();
-    setupImages();
+    if(imagesExist){
+      functionObject.resetImages();
+      if(scene) scene.resetAndSetupImages();
+      setupImages();
+    }
   }
 }
 
