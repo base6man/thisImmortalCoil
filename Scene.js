@@ -751,13 +751,14 @@ class Scene{
             this.floor.updateImage();
         }
 
+        /*
         if(!this.buttonPressed){
             let buttonIndex = Math.floor((6*time.runTime) % 4);
             bigRedButtonImage[buttonIndex].draw(25, 537.5);
         }
         else{
             bigRedButtonImage[4].draw(25, 537.5)
-        }
+        }*/
 
         for(let i in this.walls){ this.walls[i].updateImage(); }
         this.player.updateImage();

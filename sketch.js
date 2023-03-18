@@ -82,11 +82,11 @@ let songSwitchTime;
 let difficulty = 1;
 let runNumber = 0;
 
-let saveFileContents;
 
+/*
 fs.readFile("lib/saveData.txt", function(err, data) {
     if(err) return console.error(err);
-    saveFileContents = data.toString();
+    let saveFileContents = data.toString();
 
     let fileArray = saveFileContents.split(/\r?\n/);
 
@@ -95,7 +95,7 @@ fs.readFile("lib/saveData.txt", function(err, data) {
     if(fileArray[2]) hardMode = fileArray[2] === 'true';
     console.log(deathDifficulties, deathBosses, hardMode)
 });
-
+*/
 
 let deathDifficulties = []
 let hardMode = false;
@@ -407,13 +407,14 @@ const sketch = (p) => {
       p.loadImage("images/floorImages/cleanFloor/nullTile.png")
     ]
 
+    /*
     bigRedButtonImage = [
       p.loadImage("images/floorImages/bigRedbutton.png"),
       p.loadImage("images/floorImages/bigRedbutton1.png"),
       p.loadImage("images/floorImages/bigRedbutton2.png"),
       p.loadImage("images/floorImages/bigRedbutton1.png"),
       p.loadImage("images/floorImages/bigRedbuttonPressed.png")
-    ]
+    ]*/
 
     attackImage = [
       p.loadImage("images/attackImages/newAttack.png")
