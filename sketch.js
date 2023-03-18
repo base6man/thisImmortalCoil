@@ -85,7 +85,7 @@ let difficulty = 1;
 let runNumber = 0;
 
 try{
-  fs.readFile("lib/SaveData.txt", function(err, data) {
+  fs.readFile("lib/SavedData.txt", function(err, data) {
       if(err) return console.error(err);
       let saveFileContents = data.toString();
   
@@ -415,7 +415,7 @@ const sketch = (p) => {
     bigRedButtonImage = [
       p.loadImage("images/floorImages/bigRedButton.png"),
       p.loadImage("images/floorImages/bigRedButton1.png"),
-      p.loadImage("images/floorImages/bigRedButton2.png"),
+      p.loadImage("images/floorImages/bigRedButtonTwo.png"),
       p.loadImage("images/floorImages/bigRedButton1.png"),
       p.loadImage("images/floorImages/bigRedButtonPressed.png")
     ]

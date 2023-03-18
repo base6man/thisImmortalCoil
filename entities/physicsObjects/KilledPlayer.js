@@ -1,4 +1,4 @@
-class DeadPlayer extends Player{
+class KilledPlayer extends Player{
     constructor(startPos){
         super(startPos);
 

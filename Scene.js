@@ -758,8 +758,7 @@ class Scene{
         
         if(!this.buttonPressed){
             let buttonIndex = Math.floor((6*time.runTime) % 4);
-            //bigRedButtonImage[buttonIndex].draw(25, 537.5);
-            bigRedButtonImage[buttonIndex].draw(25, -337.5);
+            bigRedButtonImage[buttonIndex].draw(25, 537.5);
         }
         else{
             bigRedButtonImage[4].draw(25, 537.5)

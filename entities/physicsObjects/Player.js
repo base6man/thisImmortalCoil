@@ -617,7 +617,7 @@ class Player extends PhysicsObject{
         scene.endSong();
         playSound('sounds/deathSound.wav');
         scene.killPlayer();
-        scene.player = new DeadPlayer(this.position);
+        scene.player = new KilledPlayer(this.position);
         scene.player.doKnockback(otherPosition);
     }
 }
