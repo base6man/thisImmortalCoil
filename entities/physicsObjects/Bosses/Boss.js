@@ -82,6 +82,8 @@ class Boss extends PhysicsObject{
             'Start text'
         ]
 
+        this.deathColor = scene.p.color(230, 220, 220);
+
         this.song;
         this.songIsInstant = false;
 
@@ -428,7 +430,6 @@ class Boss extends PhysicsObject{
             }
             else if(!this.invincible){
 
-                console.log('Got hit!');
                 this.health -= 1;
 
                 if(this.health <= 0 && this.isMainBoss){
@@ -441,7 +442,15 @@ class Boss extends PhysicsObject{
                 else{
                     if(this.isMainBoss){
                         scene.mainCamera.createShake(1.5);
-                        time.hitStop(0.08);
+
+                        time.hitStop(0.1, 0.03);
+                        scene.glitch();
+                        time.delayedFunction(scene, "unglitch", 0.03);
+                        scene.timeSinceLastHit = 0;
+
+                        this.target.velocity = new Vector(0, 0);
+
+                        playSound(hitBoss);
                         scene.bossManager.bossIsHit(this);
                     }
                     else{
@@ -464,33 +473,41 @@ class Boss extends PhysicsObject{
         }
     }
 
-    getHitAndDie(){
+    getHitAndDie(flashEffect = true){
         this.invincible = true;
         this.returnToRunSpeed();
         this.freezePosition = this.position.copy();
         this.collider.delete();
         
-        let index = randRangeInt(0, this.deathTextList.length-1);
-        this.textbox = scene.createTypedTextbox([this.deathTextList[index]]);
-        this.textbox.typingSpeed = 350 * 6;
-        
         for(let i of this.myBots) i.killBoss(true);
 
-        let freezeInput = this.vectorToPlayer.copy();
-        freezeInput.magnitude = 1;
-        freezeInput.angle += Math.PI;
+        if(flashEffect){
+        
+            let index = randRangeInt(0, this.deathTextList.length-1);
+            this.textbox = scene.createTypedTextbox([this.deathTextList[index]]);
+            this.textbox.typingSpeed = 350 * 6;
 
-        this.target.setInput(freezeInput);
-        this.target.speed = 5;
-        this.target.velocity.magnitude = 5 * this.target.speedMult;
-        this.target.freeze();
+            let freezeInput = this.vectorToPlayer.copy();
+            freezeInput.magnitude = 1;
+            freezeInput.angle += Math.PI;
+    
+            this.target.setInput(freezeInput);
+            this.target.speed = 5;
+            this.target.velocity.magnitude = 5 * this.target.speedMult;
+            this.target.freeze();
+    
+            time.hitStop(1.3, 0.1, false);
+    
+            scene.mainCamera.targetPos = this.position;
+    
+            scene.coverScreenColor = this.deathColor;
+            scene.coverScreen = 1.2;
+            scene.coverScreenChange = -0.01
+            
+            time.delayedFunction(this, 'endPlayerFreeze', 0.2);
+        }
 
-        time.hitStop(1.1, 0.1, false);
-
-        scene.mainCamera.targetPos = this.position;
-
-        time.delayedFunction(this, 'killBoss', 0.3);
-        time.delayedFunction(this, 'endPlayerFreeze', 0.11);
+        time.delayedFunction(this, 'killBoss', 0.5);
 
         scene.killBulletsInRange(this.arenaCenter, 9999);
         scene.bulletsCannotSpawn = true;

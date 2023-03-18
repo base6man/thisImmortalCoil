@@ -22,8 +22,8 @@ class Guard extends Boss{
         
         this.health = 3;
         
-        this.knockbackSpeed = 60;
-        this.knockbackTime = 0.2;
+        this.knockbackSpeed = 80;
+        this.knockbackTime = 0.1;
 
         this.restrictedAttacks = [];
 

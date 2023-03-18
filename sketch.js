@@ -72,7 +72,7 @@ let songVolume = 0.5; // 0.5
 let currentSongVolume;
 
 let voiceEffects;
-let whoosh, hit;
+let whoosh, hit, hitBoss;
 let whooshVolume = 0.6;
 
 let staticVolume = 0.0;
@@ -83,7 +83,7 @@ let difficulty = 1;
 let runNumber = 0;
 
 let saveFileContents;
-/*
+
 fs.readFile("lib/saveData.txt", function(err, data) {
     if(err) return console.error(err);
     saveFileContents = data.toString();
@@ -92,10 +92,10 @@ fs.readFile("lib/saveData.txt", function(err, data) {
 
     if(fileArray[0]) deathDifficulties = fileArray[0].split(",");
     if(fileArray[1]) deathBosses = fileArray[1].split(",");
-    if(fileArray[2]) hardMode = fileArray[2];
+    if(fileArray[2]) hardMode = fileArray[2] === 'true';
     console.log(deathDifficulties, deathBosses, hardMode)
 });
-*/
+
 
 let deathDifficulties = []
 let hardMode = false;
@@ -272,8 +272,7 @@ function killScene(newTransition = new Transition([], p), timeUntilNextScene){
   transition = newTransition;
   scene = null;
 
-  time.delayedFunction(functionObject, 'createScene', timeUntilNextScene);
-  time.delayedFunction(functionObject, 'setupScene', timeUntilNextScene);
+  time.delayedFunction(functionObject, 'createAndSetupScene', timeUntilNextScene, [], true);
 }
 
 function playSong(song, oldSong, volume, switchTime = 1){
@@ -290,11 +289,12 @@ function playSong(song, oldSong, volume, switchTime = 1){
     if(volume) currentSong.volume = volume;
     //currentSong.play();
     currentSong.loop = true;
-    
-    //if(oldSong)
-    //  previousSong = oldSong;
-    
   }
+  else{
+    currentSong = null;
+    currentSongName = null;
+  }
+
   if(oldSong){
     previousSong = oldSong;
     //oldSong.pause();
@@ -559,6 +559,8 @@ const sketch = (p) => {
     
     whoosh = "sounds/whoosh.wav";
     hit = "sounds/hit.mp3";
+    hitBoss = "sounds/hitBoss.mp3";
+    
     voiceEffects = {
       sam: "sounds/voiceSam.wav",
       dot: "sounds/voiceDot.wav",

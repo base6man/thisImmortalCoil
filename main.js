@@ -49,16 +49,18 @@ function createWindow() {
     //let deathBosses = remote.getGlobal('deathBosses');
     //let hardMode = remote.getGlobal('hardMode');
 
-    /*
-    fs.truncate('lib/saveData.txt', 0, function(){console.log('done')})
-            
-    fs.appendFile("lib/saveData.txt", global.myGlobalVariable, function (err) {
-        if (err) return console.error(err);
-        else{
-           console.log("The file is updated with the given data")
-        }
-    });
-    */
+    if(global.myGlobalVariable){
+
+      fs.truncate('lib/saveData.txt', 0, function(){console.log('done')})
+              
+      fs.appendFile("lib/saveData.txt", global.myGlobalVariable, function (err) {
+          if (err) return console.error(err);
+          else{
+             console.log("The file is updated with the given data")
+          }
+      });
+    }
+    
   })
 }
 

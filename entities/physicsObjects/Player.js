@@ -605,6 +605,9 @@ class Player extends PhysicsObject{
         scene.mainCamera.createShake(3);
         scene.mainCamera.freezeTarget = this;
         time.hitStop(0.1);
+        scene.coverScreenColor = scene.p.color(0)
+        scene.coverScreen = 0.3;
+        scene.coverScreenChange = -0.001;
 
         scene.killBulletsInRange(this.position, 100);
     }

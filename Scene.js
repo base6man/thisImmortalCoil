@@ -49,6 +49,11 @@ class Scene{
 
         this.buttonPressed = false;
 
+        this.isGlitched = false;
+        this.glitchSeedX;
+        this.glitchSeedY;
+        this.glitchSeedIndex;
+
         time.stopSynch();
     }
 
@@ -630,7 +635,7 @@ class Scene{
 
         this.player.freeze();
         this.coverScreenColor = this.p.color(255, 255, 255);
-        this.coverScreenChange = 0.9;
+        this.coverScreenChange = 0.9/255;
 
         this.buttonPressed = true;
 
@@ -730,6 +735,8 @@ class Scene{
         // Has to be in this order
         // I hate it; I would make it in a different order, but that can't happen
 
+        this.glitchSeedIndex = 0;
+
         if(this.playerIsDead){
             this.player.updateImage();
             this.mainCamera.updateImage();
@@ -789,7 +796,7 @@ class Scene{
         this.p.push();
         {
             let myColor = this.coverScreenColor;
-            myColor.setAlpha(this.coverScreen);
+            myColor.setAlpha(this.coverScreen*255);
             this.p.background(myColor);
         }
         this.p.pop();
@@ -818,7 +825,8 @@ class Scene{
         }
 
         if(currentSong && !currentSong.paused){
-            currentSong.volume = currentSongVolume * hitMultiplier;
+            if(isNumber(currentSongVolume * hitMultiplier)) currentSong.volume = currentSongVolume * hitMultiplier;
+            else{ currentSong.volume = songVolume; }
         }
 
         if(previousSong && previousSong.volume < 0 && !previousSong.paused) {
@@ -833,10 +841,10 @@ class Scene{
     updateSong(song, volume = 1.0, instant = false){
             
         let oldSong = currentSong;
-        //if(oldSong == song && song) return;
-        //if (oldSong == songs[runNumber]) return;
+        let oldSongName = currentSongName;
+        if(oldSongName == song && song) return;
+        if (oldSongName == songs[runNumber] && !song) return;
 
-        if(oldSong) console.log(oldSong);
 
         if(instant) playSongInstant(song, oldSong, volume);
         else if(song) playSong(song, oldSong, volume);
@@ -910,6 +918,9 @@ class Scene{
     }
 
     blinkOutToNewScene(){
+        this.coverScreenChange = 0;
+        this.coverScreen = 0;
+        this.coverScreenColor = this.p.color(0);
         for(let i = 0; i < 0.5; i += 0.1){
             time.delayedFunction(this, 'toggleBlackScreen', i);
         }
@@ -918,7 +929,9 @@ class Scene{
     }
 
     toggleBlackScreen(){
-        this.screenIsBlack = !this.screenIsBlack;
+        console.log(this.coverScreen);
+        if(this.coverScreen == 1) this.coverScreen = 0;
+        else{                     this.coverScreen = 1; }
     }
 
     createInstantScene(){
@@ -955,6 +968,7 @@ class Scene{
                 if(this.runCredits){
                     runNumber = 0;
                     difficulty = 1;
+                    maxPlayerHealth = 3;
                     hardMode = true;
                     deathBosses = []
                     deathDifficulties = []
@@ -985,9 +999,29 @@ class Scene{
         }
     }
 
+    glitch(){
+        this.isGlitched = true;
+        this.glitchSeedX = []
+        this.glitchSeedY = []
+        for(let i = 0; i < 1000; i++){
+            this.glitchSeedX.push(randRangeInt(-1, 1));
+            this.glitchSeedY.push(randRangeInt(-1, 1));
+        }
+    }
+
+    unglitch(){
+        this.isGlitched = false;
+    }
+
     drawImage(x, y, img, rotation = 'right', transparency = 0){
 
         if(this.coverScreen == 1) return;
+
+        if(this.isGlitched){
+            x += this.glitchSeedX[this.glitchSeedIndex];
+            y += this.glitchSeedX[this.glitchSeedIndex];
+            this.glitchSeedIndex++
+        }
 
         {
             this.p.push();

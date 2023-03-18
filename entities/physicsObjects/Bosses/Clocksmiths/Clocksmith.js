@@ -29,8 +29,8 @@ class Clocksmith extends Boss{
         this.minDistance = this.normalMinDistance;
         this.maxDistance = this.normalMaxDistance;
         
-        this.knockbackSpeed = 50;
-        this.knockbackTime = 0.5;
+        this.knockbackSpeed = 70;
+        this.knockbackTime = 0.2;
         
         this.normalLookAheadTime = 0.8;
         this.lookAheadTime = this.normalLookAheadTime;

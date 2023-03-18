@@ -105,11 +105,32 @@ class CaptainSoldier extends Soldier{
             for(let i of this.children) i.updateImage();
     }
 
-    killBoss(){
-        this.healsPlayer = true;
+    getHitAndDie(){
+        let healsPlayer = true;
         for(let i of this.otherBosses)
-            if(i.isAlive) this.healsPlayer = false;
+            if(i.isAlive) healsPlayer = false;
 
-        super.killBoss(false, this.healsPlayer);
+        super.getHitAndDie(healsPlayer)
+        
+        if(healsPlayer = false){
+            scene.mainCamera.createShake(1.5);
+
+            time.hitStop(0.1, 0.03);
+            scene.glitch();
+            time.delayedFunction(scene, "unglitch", 0.03);
+            scene.timeSinceLastHit = 0;
+
+            this.target.velocity = new Vector(0, 0);
+
+            playSound(hitBoss);
+        }
+    }
+
+    killBoss(){
+        let healsPlayer = true;
+        for(let i of this.otherBosses)
+            if(i.isAlive) healsPlayer = false;
+
+        super.killBoss(false, healsPlayer);
     }
 }

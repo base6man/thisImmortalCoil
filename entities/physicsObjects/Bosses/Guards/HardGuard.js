@@ -125,7 +125,8 @@ class HardGuard extends Guard{
         super.getHitAndDie();
 
         if(this.addTwoHealth){
-            scene.updateSong(this.song, 0.6, true);
+            scene.coverScreen = 0;
+            scene.updateSong(this.song, 1.0, true);
             time.delayedFunction(scene, "blinkOutToNewScene", 0.2);
         }
         else{
