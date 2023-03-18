@@ -504,7 +504,7 @@ class Boss extends PhysicsObject{
             scene.coverScreen = 1.2;
             scene.coverScreenChange = -0.01
             
-            time.delayedFunction(this, 'endPlayerFreeze', 0.2);
+            time.delayedFunction(this, 'endPlayerFreeze', 0.13);
         }
 
         time.delayedFunction(this, 'killBoss', 0.5);

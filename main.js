@@ -48,7 +48,7 @@ function createWindow() {
     //let deathDifficulties = remote.getGlobal('deathDifficulties');
     //let deathBosses = remote.getGlobal('deathBosses');
     //let hardMode = remote.getGlobal('hardMode');
-
+    
     if(global.myGlobalVariable){
 
       fs.truncate('lib/saveData.txt', 0, function(){console.log('done')})

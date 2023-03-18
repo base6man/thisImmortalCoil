@@ -407,14 +407,14 @@ const sketch = (p) => {
       p.loadImage("images/floorImages/cleanFloor/nullTile.png")
     ]
 
-    /*
+    
     bigRedButtonImage = [
-      p.loadImage("images/floorImages/bigRedbutton.png"),
-      p.loadImage("images/floorImages/bigRedbutton1.png"),
-      p.loadImage("images/floorImages/bigRedbutton2.png"),
-      p.loadImage("images/floorImages/bigRedbutton1.png"),
-      p.loadImage("images/floorImages/bigRedbuttonPressed.png")
-    ]*/
+      p.loadImage("images/floorImages/bigRedButton.png"),
+      p.loadImage("images/floorImages/bigRedButton1.png"),
+      p.loadImage("images/floorImages/bigRedButton2.png"),
+      p.loadImage("images/floorImages/bigRedButton1.png"),
+      p.loadImage("images/floorImages/bigRedButtonPressed.png")
+    ]
 
     attackImage = [
       p.loadImage("images/attackImages/newAttack.png")
