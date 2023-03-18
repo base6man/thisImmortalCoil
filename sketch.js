@@ -317,7 +317,7 @@ function playSongInstant(song, oldSong, volume){
     currentSong.volume *= songVolume;
     currentSong.loop = true;
     
-
+    console.log(currentSong);
     songSwitchTime = 99;
   }
   if(oldSong){

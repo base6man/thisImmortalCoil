@@ -853,6 +853,9 @@ class Scene{
     }
 
     endSong(timeToEnd){
+        if(!timeToEnd){
+            playSongInstant(null, currentSong, 1.0);
+        }
         playSong(null, currentSong, 1.0, timeToEnd);
     }
 
@@ -958,7 +961,6 @@ class Scene{
                 difficulty = 1;
                 maxPlayerHealth = 3;
             
-                this.updateSong();
                 time.stopFunctionsWithinScene();
                 
                 functionObject.createScene();

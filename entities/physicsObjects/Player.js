@@ -527,11 +527,10 @@ class Player extends PhysicsObject{
 
             if(!this.invincible){
                 
-                scene.timeSinceLastHit = 0;
-                playSound(hit);
                 this.health -= 1;
 
                 if(this.health <= 0){
+
                     if(randRange(0, 10) < 3 && !this.gotExtraHealth) {
                         this.getHit();
 
@@ -590,6 +589,8 @@ class Player extends PhysicsObject{
     }
 
     getHit(){
+        scene.timeSinceLastHit = 0;
+        playSound(hit);
 
         this.invincible = true;
         this.knockedBack = true;
@@ -613,6 +614,8 @@ class Player extends PhysicsObject{
     }
 
     die(otherPosition){
+        scene.endSong();
+        playSound('sounds/deathSound.wav');
         scene.killPlayer();
         scene.player = new DeadPlayer(this.position);
         scene.player.doKnockback(otherPosition);
