@@ -70,12 +70,12 @@ let cutsceneMult = 1.25;
 
 let songs, creditsSong;
 let currentSong, currentSongName, previousSong;
-let songVolume = 0.5; // 0.5
+let songVolume = 0.6; // 0.5
 let currentSongVolume;
 
 let voiceEffects;
 let whoosh, hit, hitBoss;
-let whooshVolume = 0.6;
+let whooshVolume = 0.5;
 
 let staticVolume = 0.0;
 let songSwitchTimeTotal;
@@ -104,7 +104,7 @@ catch{
 */
 
 let deathDifficulties = []
-let hardMode = false;
+let hardMode = 0;
 let deathBosses = []
 
 function getDeathCount(){ 
