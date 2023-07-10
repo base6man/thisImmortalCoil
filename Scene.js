@@ -987,7 +987,7 @@ class Scene{
                 functionObject.createScene();
                 functionObject.setupScene();
             }
-            else{
+            else{ 
                 if(this.runCredits){
                     runNumber = 0;
                     difficulty = 1;
