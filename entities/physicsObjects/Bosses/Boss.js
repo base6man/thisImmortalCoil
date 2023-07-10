@@ -284,8 +284,7 @@ class Boss extends PhysicsObject{
     get difficulty(){
         let newDifficultyMult = this.difficultyMultiplier * (1.2 - this.timesPlayerDiedToThis/10);
 
-        if(hardMode) return difficulty + 3;
-        return difficulty * newDifficultyMult;
+        return difficulty * newDifficultyMult + 3 * hardMode;
     }
 
     get globalDifficulty(){

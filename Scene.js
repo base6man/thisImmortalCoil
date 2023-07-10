@@ -147,10 +147,21 @@ class Scene{
             ]);
         }
 
-        if(runNumber == 0 && hardMode && getDeathCount() == 0)
+        if(runNumber == 0 && hardMode == 1 && getDeathCount() == 0)
             this.player.createDialougue([
                 new Quote(["Hard mode unlocked!"], 1),
                 new Quote(["To access, just keep playing."], 3),
+                new Quote([''], 5.5)
+            ]); 
+        else if(runNumber == 0 && hardMode == 2 && getDeathCount() == 0)
+            this.player.createDialougue([
+                new Quote(["Wow, you beat hard mode!"], 1),
+                new Quote(["Well, it only gets tougher from here."], 3),
+                new Quote([''], 5.5)
+            ]); 
+        else if(runNumber == 0 && hardMode > 2 && getDeathCount() == 0)
+            this.player.createDialougue([
+                new Quote(["Entering hard mode 2" + hardMode], 1),
                 new Quote([''], 5.5)
             ]); 
         else if(runNumber == 0 && getDeathCount() == 4)
@@ -981,7 +992,7 @@ class Scene{
                     runNumber = 0;
                     difficulty = 1;
                     maxPlayerHealth = 3;
-                    hardMode = true;
+                    hardMode++;
                     deathBosses = []
                     deathDifficulties = []
 
